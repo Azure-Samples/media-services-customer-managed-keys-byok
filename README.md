@@ -35,19 +35,19 @@ Register an app with Azure Active Directory to establish a service principal wit
 ### Quickstart
 Establish your environment variables in Postman. The will be used as the variables that are contained within {{ }} brackets.  For example {{tenantId}}.
 
-tenantId = your tenant id
-servicePrincipalId = the id of the service principal you establish with your favorite method: portal, CLI, etc.
-servicePrincipalSecret = the secret created for the service principal
-subscription = your subscription id
-armResource = `https://management.core.windows.net`
-graphResource = `https://graph.windows.net/`
-keyVaultResource = `https://vault.azure.net`
-armEndpoint = `management.azure.com`
-graphEndpoint = `graph.windows.net`
-aadEndpoint = `login.microsoftonline.com`
-keyVaultDomainSuffix = `vault.azure.net`
-storageName = the name you want to give to your storage
-accountName = the Media Service account name you want to use
-keyVaultName = the Key Vault name you want to use
-resourceLocation = centralus (Or where ever you want to put your resources.  This collection has only been tested with centralus.)
-resourceGroup = the resource group name
+* *tenantId* = your tenant id
+* *servicePrincipalId* = the id of the service principal you establish with your favorite method: portal, CLI, etc.
+* *servicePrincipalSecret* = the secret created for the service principal
+* *subscription* = your subscription id
+* *armResource* = `https://management.core.windows.net`
+* *graphResource* = `https://graph.windows.net/`
+* *keyVaultResource* = `https://vault.azure.net`
+* *armEndpoint* = `management.azure.com`
+* *graphEndpoint* = `graph.windows.net`
+* *aadEndpoint* = `login.microsoftonline.com`
+* *keyVaultDomainSuffix* = `vault.azure.net`
+* *storageName* = the name you want to give to your storage
+* *accountName* = the Media Service account name you want to use
+* *keyVaultName* = the Key Vault name you want to use
+* *resourceLocation* = centralus (Or where ever you want to put your resources.  This collection has only been tested with centralus.)
+* *resourceGroup* = the resource group name
