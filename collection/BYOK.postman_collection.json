@@ -1,0 +1,618 @@
+{
+	"info": {
+		"_postman_id": "6faed55f-5dfc-46b6-a5ab-7ad79152cdb4",
+		"name": "BYOK",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get AAD Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "690d835f-356a-401f-bbc8-e650fc867d42",
+						"exec": [
+							"pm.test(pm.info.requestName, () => {",
+							"    pm.response.to.not.be.error;",
+							"    pm.response.to.not.have.jsonBody('error');",
+							"});",
+							"pm.globals.set(\"bearerToken\", pm.response.json().access_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{servicePrincipalId}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{servicePrincipalSecret}}",
+							"type": "text"
+						},
+						{
+							"key": "resource",
+							"value": "{{armResource}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://{{aadEndpoint}}/{{tenantId}}/oauth2/token",
+					"protocol": "https",
+					"host": [
+						"{{aadEndpoint}}"
+					],
+					"path": [
+						"{{tenantId}}",
+						"oauth2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Graph Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e2da37e3-e9c4-4ae2-aac6-6fc98e588e73",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.globals.set('graphToken',data.access_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "resource",
+							"value": "{{graphResource}}",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{servicePrincipalId}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{servicePrincipalSecret}}",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://{{aadEndpoint}}/{{tenantId}}/oauth2/token",
+					"protocol": "https",
+					"host": [
+						"{{aadEndpoint}}"
+					],
+					"path": [
+						"{{tenantId}}",
+						"oauth2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Service Principal Details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c31fc9df-0ddd-49ee-8335-995e2b84862f",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.globals.set('servicePrincipalObjectId, data.value[0].objectId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{graphToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{graphEndpoint}}/{{tenantId}}/servicePrincipals?$filter=appId%20eq%20'{{servicePrincipalId}}'&api-version=1.6",
+					"protocol": "https",
+					"host": [
+						"{{graphEndpoint}}"
+					],
+					"path": [
+						"{{tenantId}}",
+						"servicePrincipals"
+					],
+					"query": [
+						{
+							"key": "$filter",
+							"value": "appId%20eq%20'{{servicePrincipalId}}'"
+						},
+						{
+							"key": "api-version",
+							"value": "1.6"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Resource Group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b54b582d-eed3-42d2-b2cb-ab4d49b8cba5",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.globals.set('resourceGroupId', data.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"location\": \"{{resourceLocation}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{armEndpoint}}/subscriptions/{{subscription}}/resourceGroups/{{resourceGroup}}?api-version=2016-09-01",
+					"protocol": "https",
+					"host": [
+						"{{armEndpoint}}"
+					],
+					"path": [
+						"subscriptions",
+						"{{subscription}}",
+						"resourceGroups",
+						"{{resourceGroup}}"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "2016-09-01"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create storage account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "01732244-6213-4067-905d-2cd385f2e65f",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.globals.set('storageAccountId', data.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"sku\": {\r\n    \"name\": \"Standard_GRS\"\r\n    },\r\n    \"kind\": \"StorageV2\",\r\n    \"location\": \"{{resourceLocation}}\",\r\n    \"properties\": {\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{armEndpoint}}/subscriptions/{{subscription}}/resourceGroups/{{resourceGroup}}/providers/Microsoft.Storage/storageAccounts/{{storageName}}?api-version=2019-06-01",
+					"protocol": "https",
+					"host": [
+						"{{armEndpoint}}"
+					],
+					"path": [
+						"subscriptions",
+						"{{subscription}}",
+						"resourceGroups",
+						"{{resourceGroup}}",
+						"providers",
+						"Microsoft.Storage",
+						"storageAccounts",
+						"{{storageName}}"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "2019-06-01"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a Media Services Account with a System Manged Identity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "97e95bee-addd-4f28-87be-220bb4a253c4",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.globals.set('principalId', data.identity.principalId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"identity\": {\r\n      \"type\": \"SystemAssigned\"\r\n  },\r\n  \"properties\": {\r\n    \"storageAccounts\": [\r\n      {\r\n        \"id\": \"/subscriptions/{{subscription}}/resourceGroups/{{resourceGroup}}/providers/Microsoft.Storage/storageAccounts/{{storageName}}\"\r\n      }\r\n    ],\r\n    \"encryption\": {\r\n      \"type\": \"SystemKey\"\r\n    }\r\n  },\r\n  \"location\": \"{{resourceLocation}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{armEndpoint}}/subscriptions/{{subscription}}/resourceGroups/{{resourceGroup}}/providers/Microsoft.Media/mediaservices/{{accountName}}?api-version=2020-05-01",
+					"protocol": "https",
+					"host": [
+						"{{armEndpoint}}"
+					],
+					"path": [
+						"subscriptions",
+						"{{subscription}}",
+						"resourceGroups",
+						"{{resourceGroup}}",
+						"providers",
+						"Microsoft.Media",
+						"mediaservices",
+						"{{accountName}}"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "2020-05-01"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a Key Vault, granting access to the service principal used in this script and the Media Services Managed Identity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dee26a9f-1bfb-4592-b69d-04a9d32e08db",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.globals.set('keyVaultId', data.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"location\": \"{{resourceLocation}}\",\r\n  \"tags\": {},\r\n  \"properties\": {\r\n    \"tenantId\": \"{{tenantId}}\",\r\n    \"sku\": {\r\n      \"name\": \"standard\",\r\n      \"family\": \"A\"\r\n    },\r\n    \"accessPolicies\": [\r\n      {\r\n        \"tenantId\": \"{{tenantId}}\",\r\n        \"objectId\": \"{{servicePrincipalObjectId}}\",\r\n        \"permissions\": {\r\n          \"keys\": [ \"decrypt\", \"encrypt\", \"unwrapKey\", \"wrapKey\", \"verify\", \"sign\", \"get\", \"list\", \"update\", \"create\", \"import\", \"delete\", \"backup\", \"restore\", \"recover\" ]\r\n        }\r\n      },\r\n      {\r\n        \"tenantId\": \"{{tenantId}}\",\r\n        \"objectId\": \"{{principalId}}\",\r\n        \"permissions\": {\r\n          \"keys\": [ \"decrypt\", \"encrypt\", \"unwrapKey\", \"wrapKey\", \"verify\", \"sign\", \"get\", \"list\", \"update\", \"create\", \"import\", \"delete\", \"backup\", \"restore\", \"recover\" ]\r\n        }\r\n      }\r\n    ],\r\n    \"enableSoftDelete\": true,\r\n    \"enablePurgeProtection\": true,\r\n    \"networkAcls\": {\r\n      \"bypass\": \"AzureServices\",\r\n      \"defaultAction\": \"Allow\",\r\n      \"ipRules\": [],\r\n      \"virtualNetworkRules\": []\r\n    }\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{armEndpoint}}/subscriptions/{{subscription}}/resourceGroups/{{resourceGroup}}/providers/Microsoft.KeyVault/vaults/{{keyVaultName}}?api-version=2018-02-14",
+					"protocol": "https",
+					"host": [
+						"{{armEndpoint}}"
+					],
+					"path": [
+						"subscriptions",
+						"{{subscription}}",
+						"resourceGroups",
+						"{{resourceGroup}}",
+						"providers",
+						"Microsoft.KeyVault",
+						"vaults",
+						"{{keyVaultName}}"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "2018-02-14"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Key Vault Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4fbabca0-6242-4a7e-9400-7ab395ece018",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.globals.set('keyVaultToken', data.access_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "resource",
+							"value": "{{keyVaultResource}}",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{servicePrincipalId}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{servicePrincipalSecret}}",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://{{aadEndpoint}}/{{tenantId}}/oauth2/token",
+					"protocol": "https",
+					"host": [
+						"{{aadEndpoint}}"
+					],
+					"path": [
+						"{{tenantId}}",
+						"oauth2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create RSA key in the key vault",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "894aab60-4fd4-40a4-b82a-21931199e212",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.globals.set('keyId', data.key.kid);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{keyVaultToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"kty\": \"RSA\",\r\n  \"key_size\": 2048,\r\n  \"attributes\": {\r\n    \"enabled\": true\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{keyVaultName}}.{{keyVaultDomainSuffix}}/keys/{{keyName}}/create?api-version=7.0",
+					"protocol": "https",
+					"host": [
+						"{{keyVaultName}}",
+						"{{keyVaultDomainSuffix}}"
+					],
+					"path": [
+						"keys",
+						"{{keyName}}",
+						"create"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "7.0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update the Media Services account to use the key",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"identity\": {\r\n      \"type\": \"SystemAssigned\"\r\n  },\r\n  \"properties\": {\r\n    \"storageAccounts\": [\r\n      {\r\n        \"id\": \"{{storageAccountId}}\"\r\n      }\r\n    ],\r\n    \"encryption\": {\r\n        \"type\": \"CustomerKey\",\r\n        \"keyVaultProperties\": { \"keyIdentifier\": \"{{keyId}}\" }\r\n    }\r\n  },\r\n  \"location\": \"{{resourceLocation}}\",\r\n  \"tags\": {}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{armEndpoint}}/subscriptions/{{subscription}}/resourceGroups/{{resourceGroup}}/providers/Microsoft.Media/mediaservices/{{accountName}}?api-version=2020-05-01",
+					"protocol": "https",
+					"host": [
+						"{{armEndpoint}}"
+					],
+					"path": [
+						"subscriptions",
+						"{{subscription}}",
+						"resourceGroups",
+						"{{resourceGroup}}",
+						"providers",
+						"Microsoft.Media",
+						"mediaservices",
+						"{{accountName}}"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "2020-05-01"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
