@@ -34,6 +34,8 @@ Register an app with Azure Active Directory to establish a service principal wit
 6. Select Open.  (You will see a warning that it will not be imported as an API, but as a collection, which is fine.  This is what you want.)
 7. This collection will now show up in your Collections as BYOK.
 
+Follow the same steps to import the environment file.
+
 ### Quickstart
 Establish your environment variables in Postman. They will also be used as variables that contained within `{{ }}` brackets.  For example, `{{tenantId}}`.
 
