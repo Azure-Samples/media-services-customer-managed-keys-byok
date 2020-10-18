@@ -39,6 +39,14 @@ Establish your environment variables in Postman. The will be used as the variabl
 * *servicePrincipalId* = the id of the service principal you establish with your favorite method: portal, CLI, etc.
 * *servicePrincipalSecret* = the secret created for the service principal
 * *subscription* = your subscription id
+* *storageName* = the name you want to give to your storage
+* *accountName* = the Media Service account name you want to use
+* *keyVaultName* = the Key Vault name you want to use
+* *resourceLocation* = centralus (Or where ever you want to put your resources.  This collection has only been tested with centralus.)
+* *resourceGroup* = the resource group name
+
+The following variables are standard for working with Azure resources.
+
 * *armResource* = `https://management.core.windows.net`
 * *graphResource* = `https://graph.windows.net/`
 * *keyVaultResource* = `https://vault.azure.net`
@@ -46,8 +54,4 @@ Establish your environment variables in Postman. The will be used as the variabl
 * *graphEndpoint* = `graph.windows.net`
 * *aadEndpoint* = `login.microsoftonline.com`
 * *keyVaultDomainSuffix* = `vault.azure.net`
-* *storageName* = the name you want to give to your storage
-* *accountName* = the Media Service account name you want to use
-* *keyVaultName* = the Key Vault name you want to use
-* *resourceLocation* = centralus (Or where ever you want to put your resources.  This collection has only been tested with centralus.)
-* *resourceGroup* = the resource group name
+
