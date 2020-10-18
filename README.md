@@ -33,7 +33,7 @@ Register an app with Azure Active Directory to establish a service principal wit
 7. This collection will now show up in your Collections as BYOK.
 
 ### Quickstart
-Establish your environment variables in Postman. The will be used as the variables that are contained within {{ }} brackets.  For example {{tenantId}}.
+Establish your environment variables in Postman. The will be used as the variables that are contained within `{{ }}` brackets.  For example, `{{tenantId}}`.
 
 * *tenantId* = your tenant id
 * *servicePrincipalId* = the id of the service principal you establish with your favorite method: portal, CLI, etc.
