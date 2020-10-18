@@ -1,6 +1,6 @@
-# Project Name
+# Postman collection for customer managed keys and Media Services
 
-(short, 1-3 sentenced, description of the project)
+This collection is featued as part of the customer managed keys with Media Services tutorial.
 
 ## Features
 
